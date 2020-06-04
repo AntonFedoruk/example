@@ -62,6 +62,13 @@
             <version>1.16.16</version>
             <scope>provided</scope>
         </dependency>
+        <!--  security  -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-security</artifactId>
+<!--            <version>2.2.2.RELEASE</version>-->
+            <!--            2.2.2 can`t be found :( -->
+        </dependency>
     </dependencies>
 
     <build>
