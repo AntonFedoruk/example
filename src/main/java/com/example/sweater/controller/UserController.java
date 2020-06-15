@@ -39,9 +39,7 @@ public class UserController {
             @RequestParam String username,
             @RequestParam Map<String, String> form, //we use Map because each time number of roles can be different
             @RequestParam("userId") User user) {
-        System.out.println("In userSave()");
         user.setUsername(username);
-        System.out.println("username: " + username);
         Set<String> roles = Arrays.stream(Role.values())
                 .map(Role::name)
                 .collect(Collectors.toSet()); //get Set of all possible roles
@@ -49,7 +47,6 @@ public class UserController {
         //to add corresponding roles to user firstly we need to clear his roles, to
         // to make next code work
         user.getRoles().clear();
-        System.out.println("user roles cleared");
 
         for (String key : form.keySet()) {
             if (roles.contains(key)) { //if we pointed new role in checkbox then next
@@ -58,8 +55,6 @@ public class UserController {
         }
 
         userRepository.save(user);
-        System.out.println("user saved");
-
         return "redirect:/user";
     }
 }
