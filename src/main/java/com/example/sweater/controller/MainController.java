@@ -28,7 +28,6 @@ public class MainController {
     // The @GetMapping annotation ensures that HTTP GET requests to /greeting are mapped to the greeting() method.
     @GetMapping("/")
     public String greeting(Map<String, Object> model) {
-        System.out.println("in greeting method");
         return "greeting";
     }
     /*
