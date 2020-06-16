@@ -10,7 +10,8 @@ import javax.persistence.*;
 @Setter
 @Entity
 public class Message {
-    public Message() {}
+    public Message() {
+    }
 
     public Message(String text, String tag, User user) {
         this.text = text;
@@ -19,15 +20,17 @@ public class Message {
     }
 
     @Id
-    @GeneratedValue(strategy= GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer id;
     private String text;
     private String tag;
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id")
     private User author;
+    private String filename; //we use only name of the file, neither to store full path because we have part of the
+    //location in application.properties (upload.path)
 
-    public String getAuthorName(){
+    public String getAuthorName() {
         return author != null ? author.getUsername() : "<none>";
     }
 }

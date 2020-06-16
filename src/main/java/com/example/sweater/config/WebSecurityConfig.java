@@ -23,15 +23,16 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http
                 .authorizeRequests()
-                    .antMatchers("/","/registration").permitAll() //we grant access to all parts on page with "/" path
-                    .anyRequest().authenticated()             //we limited access on other pages
+                .antMatchers("/", "/registration", "/static").permitAll() //we grant access to all parts on page with "/","/registration" path,
+                                                                                      // "/static"(users can have access  to static resources(css)) even if they are not login
+                .anyRequest().authenticated()             //we limited access on other pages
                 .and()
-                    .formLogin()
-                    .loginPage("/login") //mapping on login page
-                    .permitAll()
+                .formLogin()
+                .loginPage("/login") //mapping on login page
+                .permitAll()
                 .and()
-                    .logout()
-                    .permitAll();
+                .logout()
+                .permitAll();
     }
 
     //to get users from DB
@@ -39,7 +40,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
         auth.userDetailsService(userService)
                 .passwordEncoder(NoOpPasswordEncoder.getInstance()); //encode passwords to prevent their explicit storag
-                                                                    //NoOpPasswordEncoder is useful only for testing
+        //NoOpPasswordEncoder is useful only for testing
     }
 }
 /*
