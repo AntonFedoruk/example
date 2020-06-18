@@ -29,6 +29,10 @@ public class User implements UserDetails {
     @Enumerated(EnumType.STRING) //tell that we want save enum in String type
     private Set<Role> roles;
 
+    public boolean isAdmin() {
+        return roles.contains(Role.ADMIN);
+    }
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return getRoles();

@@ -2,7 +2,7 @@
 <#import "parts/login.ftlh" as l>
 
 <@c.page>
-    Add new user<br/>
+    <div class="mb-1">Add new user</div> <#-- class="mb-1": added little margin below -->
     ${message?ifExists}
-    <@l.login "/registration" />
+    <@l.login "/registration" true/><#-- true: is an isRegisterForm variable, it`s  need to be false to complete checking(<#if !isRegisterForm><a href="/registration">Add new user</a></#if>) to display corresponding link -->
 </@c.page>
