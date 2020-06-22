@@ -10,8 +10,6 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 
-import javax.sql.DataSource;
-
 @Configuration
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)  // this annotation adds kind of authority to give access to methods
@@ -23,8 +21,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http
                 .authorizeRequests()
-                .antMatchers("/", "/registration", "/static").permitAll() //we grant access to all parts on page with "/","/registration" path,
+                .antMatchers("/", "/registration", "/static","/activate/*").permitAll() //we grant access to all parts on page with "/","/registration" path,
                                                                                       // "/static"(users can have access  to static resources(css)) even if they are not login
+                                                                                      // "/activate/*": URl can be /activate/ + 1 segment(in which activation code was putted)
                 .anyRequest().authenticated()             //we limited access on other pages
                 .and()
                 .formLogin()

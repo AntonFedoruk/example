@@ -20,6 +20,8 @@ public class User implements UserDetails {
     private String username;
     private String password;
     private boolean active;
+    private String email;
+    private String activationCode; //used to affirmative that user is owner of this mailbox
 
     //@ElementCollection create additional table to enum containing
     @ElementCollection(targetClass = Role.class, fetch = FetchType.EAGER)
