@@ -2,33 +2,31 @@ package com.example.sweater.controller;
 
 import com.example.sweater.domain.Role;
 import com.example.sweater.domain.User;
-import com.example.sweater.repository.UserRepository;
+import com.example.sweater.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Arrays;
 import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/user") //global mapping to all following methods
-@PreAuthorize("hasAuthority('ADMIN')") //user must has ADMIN authority to get access to the nested methods
 public class UserController {
     @Autowired
-    private UserRepository userRepository;
+    private UserService userService;
 
+    @PreAuthorize("hasAuthority('ADMIN')") //user must has ADMIN authority to get access to the nested methods
     @GetMapping
     public String userList(Model model) {
-        model.addAttribute("users", userRepository.findAll());
+        model.addAttribute("users", userService.findAll());
         return "userList";
     }
 
-    // with /***** here is gona be identifier
-    @GetMapping("{user}")
+    @PreAuthorize("hasAuthority('ADMIN')") //user must has ADMIN authority to get access to the nested methods
+    @GetMapping("{user}") // with /***** here is gona be identifier
     public String userEditForm(@PathVariable User user, //Spring give a possibility to obtain User directly
                                Model model) { //from DB without necessary to  use UserRepository
         model.addAttribute("user", user);
@@ -36,27 +34,29 @@ public class UserController {
         return "userEdit";
     }
 
+    @PreAuthorize("hasAuthority('ADMIN')") //user must has ADMIN authority to get access to the nested methods
     @PostMapping
     public String userSave(
             @RequestParam String username,
             @RequestParam Map<String, String> form, //we use Map because each time number of roles can be different
             @RequestParam("userId") User user) {
-        user.setUsername(username);
-        Set<String> roles = Arrays.stream(Role.values())
-                .map(Role::name)
-                .collect(Collectors.toSet()); //get Set of all possible roles
-
-        //to add corresponding roles to user firstly we need to clear his roles, to
-        // to make next code work
-        user.getRoles().clear();
-
-        for (String key : form.keySet()) {
-            if (roles.contains(key)) { //if we pointed new role in checkbox then next
-                user.getRoles().add(Role.valueOf(key));
-            }
-        }
-
-        userRepository.save(user);
+        userService.saveUser(user, username, form);
         return "redirect:/user";
+    }
+
+    @GetMapping("profile") //url: user/profile
+    public String getProfile(Model model, @AuthenticationPrincipal User user) { //@AuthenticationPrincipal get data from context(not from db)
+        model.addAttribute("username", user.getUsername());
+        model.addAttribute("email", user.getEmail());
+        return "profile";
+    }
+
+    @PostMapping("profile")
+    public String updateProfile(@AuthenticationPrincipal User user,
+                                @RequestParam String password,
+                                @RequestParam String email) {
+        userService.updateProfile(user, password, email);
+
+        return "redirect:/user/profile";
     }
 }

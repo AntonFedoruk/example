@@ -24,6 +24,11 @@
                     <a class="nav-link" href="/user">User list</a>
                 </li>
             </#if>
+            <#if user??> <#--'user' takes from security template, where user can be get only in case of his authentication -->
+                <li class="nav-item">
+                    <a class="nav-link" href="/user/profile">Profile</a>
+                </li>
+            </#if>
         </ul>
         <#--navbar-text:  for adding vertically centered strings of text-->
         <div class="navbar-text mr-3">${name}</div>
