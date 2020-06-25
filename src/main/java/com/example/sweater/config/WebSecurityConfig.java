@@ -34,17 +34,19 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http
                 .authorizeRequests()
-                .antMatchers("/", "/registration", "/static/**","/activate/*").permitAll() //we grant access to all parts on page with "/","/registration" path,
-                                                                                      // "/static"(users can have access  to static resources(css)) even if they are not login
-                                                                                      // "/activate/*": URl can be /activate/ + 1 segment(in which activation code was putted)
-                .anyRequest().authenticated()             //we limited access on other pages
+                    .antMatchers("/", "/registration", "/static/**","/activate/*").permitAll() //we grant access to all parts on page with "/","/registration" path,
+                                                                                          // "/static"(users can have access  to static resources(css)) even if they are not login
+                                                                                          // "/activate/*": URl can be /activate/ + 1 segment(in which activation code was putted)
+                    .anyRequest().authenticated()             //we limited access on other pages
                 .and()
-                .formLogin()
-                .loginPage("/login") //mapping on login page
-                .permitAll()
+                    .formLogin()
+                    .loginPage("/login") //mapping on login page
+                    .permitAll()
                 .and()
-                .logout()
-                .permitAll();
+                    .rememberMe() //save information about session
+                .and()
+                    .logout()
+                    .permitAll();
     }
 
     //to get users from DB
