@@ -23,9 +23,6 @@ public class User implements UserDetails {
     private String username;
     @NotBlank(message = "Password can`t be empty")
     private String password;
-    @Transient //tell hibernate that this field should not be taken from DB
-    @NotBlank(message = "Password confirmation can`t be empty")
-    private String password2;
     private boolean active;
     @Email(message = "Email is not correct") //check if it look like email
     @NotBlank(message = "Email can`t be empty")
