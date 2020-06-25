@@ -2,8 +2,10 @@ package com.example.sweater.domain;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.validator.constraints.Length;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
 
 //Hibernate automatically translates the entity into a table.
 @Getter
@@ -22,7 +24,11 @@ public class Message {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
+
+    @NotBlank(message = "Please fill the message") //field shouldn`t be empty
+    @Length(max = 2048, message = "Message too long(more than 2kB)")
     private String text;
+    @Length(max = 255, message = "Message too long(more than 255B)")
     private String tag;
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id")

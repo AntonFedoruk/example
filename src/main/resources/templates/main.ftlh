@@ -15,15 +15,29 @@
        aria-controls="collapseExample">         <#--                   /\  -->
         Add new Message                         <#--                   |   -->
     </a>                                        <#--                   |   -->
-    <div class="collapse"                       <#--                   |   -->
+    <div class="collapse <#if message??>show</#if>" <#--               |   -->
          id="collapseExample"> <#-- use this 'id' to connect form with "button"; class="collapse": used to show and hide content-->
         <div class="form-group mt-3">
             <form method="post" enctype="multipart/form-data">
                 <div class="form-group">
-                    <input type="text" class="form-control" name="text" placeholder="Введіть повідомлення"/>
+                    <input type="text" class="form-control ${(textError??)?string('is-invalid','')}"
+                           value="<#if message??>${message.text}</#if>" name="text" placeholder="Введіть повідомлення"/> <#--is-invalid: throw textError to 'div class="invalid-feedback"'-->
+                    <#-- if block of validation-->
+                    <#if textError??>
+                        <div class="invalid-feedback">
+                            ${textError}
+                        </div>
+                    </#if>
                 </div>
                 <div class="form-group">
-                    <input type="text" class="form-control" name="tag" placeholder="Тег"/>
+                    <input type="text" class="form-control"
+                           value="<#if message??>${message.tag}</#if>" name="tag" placeholder="Тег"/>
+                    <#-- if block of validation-->
+                    <#if tagError??>
+                        <div class="invalid-feedback">
+                            ${tagError}
+                        </div>
+                    </#if>
                 </div>
                 <div class="form-group">
                     <div class="custom-file">

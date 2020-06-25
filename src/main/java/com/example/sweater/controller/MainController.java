@@ -8,16 +8,21 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.validation.Valid;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 // In Spring’s approach to building web sites, HTTP requests are handled by a controller.
 // You can easily identify the controller by the @Controller annotation.
@@ -62,28 +67,41 @@ public class MainController {
     @PostMapping("/main")   // @RequestParam means it is a parameter from the GET or POST request
     public String add(
             @AuthenticationPrincipal User user, //we get the current user as a parameter
-            @RequestParam String text,
-            @RequestParam String tag, Map<String, Object> model,
+            @Valid Message message, //@Valid start validation; due to the fact that we begin validation we must add BindingResult
+//          !!!THIS('BindingResult') ARGUMENT MUST STAY BEFORE 'MODEL' ARGUMENT, to prevent their representation in view!!!
+            BindingResult bindingResult, //list of arguments and messages about validation`s errors
+            Model model,
             @RequestParam("file") MultipartFile file
     ) throws IOException {
-        Message message = new Message(text, tag, user);
-        if (file != null && !file.getOriginalFilename().isEmpty()) {
-            File uploadDir = new File(uploadPath);
-            //check directory availability
-            if (!uploadDir.exists()) {
-                uploadDir.mkdir();
+        message.setAuthor(user);
+
+        if (bindingResult.hasErrors()) {
+            Map<String, String> errorMap = ControllerUtils.getErrors(bindingResult);
+            model.mergeAttributes(errorMap); //add to view
+            model.addAttribute("message", message);
+        } else { //validation completed without errors
+            if (file != null && !file.getOriginalFilename().isEmpty()) {
+                File uploadDir = new File(uploadPath);
+                //check directory availability
+                if (!uploadDir.exists()) {
+                    uploadDir.mkdir();
+                }
+                //create a unique file name to protect against collisions
+                String uuidFile = UUID.randomUUID().toString();
+                String resultFilename = uuidFile + "." + file.getOriginalFilename();
+                //file uploading
+                file.transferTo(new File(uploadPath + "/" + resultFilename));
+                message.setFilename(resultFilename);
             }
-            //create a unique file name to protect against collisions
-            String uuidFile = UUID.randomUUID().toString();
-            String resultFilename = uuidFile + "." + file.getOriginalFilename();
-            //file uploading
-            file.transferTo(new File(uploadPath + "/" + resultFilename));
-            message.setFilename(resultFilename);
+
+            //we need to delete our message from  model, because in order of successful message adding we will get open form with recently added data
+            model.addAttribute("message", null);
+
+            messageRepository.save(message);
         }
-        messageRepository.save(message);
         Iterable<Message> messages = messageRepository.findAll();
-        model.put("messages", messages);
-        model.put("filter", "");
+        model.addAttribute("messages", messages);
+        model.addAttribute("filter", "");
         return "main";
     }
 }
