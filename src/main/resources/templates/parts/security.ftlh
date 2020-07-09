@@ -8,10 +8,12 @@ know = Session.SPRING_SECURITY_CONTEXT??
         user = Session.SPRING_SECURITY_CONTEXT.authentication.principal <#--'user' will contain our user, that we described in DB and let us to use any of his methods  -->
         name = user.getUsername()
         isAdmin = user.isAdmin()
+        currentUserId = user.getId()
     >
 <#else>
     <#assign
         name = "unkmown"
         isAdmin = false
+        currentUserId = -1
     >
 </#if>

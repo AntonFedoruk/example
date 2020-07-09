@@ -9,6 +9,6 @@ import java.util.List;
 
 // This will be AUTO IMPLEMENTED by Spring into a Bean called userRepository
 // CRUD refers Create, Read, Update, Delete
-public interface MessageRepository extends CrudRepository<Message, Integer> {
+public interface MessageRepository extends CrudRepository<Message, Long> {
     List<Message> findByTag(String tag);
 }

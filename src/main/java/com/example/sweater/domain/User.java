@@ -7,23 +7,42 @@ import javax.persistence.*;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import java.util.Collection;
+import java.util.Objects;
 import java.util.Set;
 
 @Entity
 @Table(name = "usr")
 public class User implements UserDetails {
+    private static final long serialVersionUID = -586292952519582857l;
+
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private long id;
+    private Long id;
+
     @NotBlank(message = "Username can`t be empty")
     private String username;
+
     @NotBlank(message = "Password can`t be empty")
     private String password;
+
     private boolean active;
+
     @Email(message = "Email is not correct") //check if it look like email
     @NotBlank(message = "Email can`t be empty")
     private String email;
+
     private String activationCode; //used to affirmative that user is owner of this mailbox
+
+    @OneToMany(mappedBy = "author", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private Set<Message> messages;
+
+    public Set<Message> getMessages() {
+        return messages;
+    }
+
+    public void setMessages(Set<Message> messages) {
+        this.messages = messages;
+    }
 
     //@ElementCollection create additional table to enum containing
     @ElementCollection(targetClass = Role.class, fetch = FetchType.EAGER)
@@ -62,11 +81,11 @@ public class User implements UserDetails {
         return isActive();
     }
 
-    public long getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -118,5 +137,18 @@ public class User implements UserDetails {
 
     public void setRoles(Set<Role> roles) {
         this.roles = roles;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        User user = (User) o;
+        return Objects.equals(id, user.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
     }
 }
