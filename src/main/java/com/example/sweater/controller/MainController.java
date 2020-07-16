@@ -93,7 +93,7 @@ public class MainController {
         Iterable<Message> messages = messageRepository.findAll();
         model.addAttribute("messages", messages);
         model.addAttribute("filter", "");
-        return "redirect:/main";
+        return "main";
     }
 
     private void saveFile(@Valid Message message, @RequestParam("file") MultipartFile file) throws IOException {

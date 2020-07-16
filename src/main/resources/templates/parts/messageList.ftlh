@@ -1,11 +1,11 @@
 <#include "security.ftlh"/>
 
-<div class="card-columns">
+<div class="card-columns" id="message-list">
     <#list messages as message>
-        <div class="card my-3 "> <#--padding top and bottom by 3-->
+        <div class="card my-3" data-id="${message.id}"> <#--padding top and bottom by 3-->
             <div>
                 <#if message.filename??>
-                    <img class="card-img-top" src="/img/${message.filename}">
+                    <img class="card-img-top" src="/img/${message.filename}"/>
                 </#if>
             </div>
             <div class="m-2"> <#--margin from all sides-->
