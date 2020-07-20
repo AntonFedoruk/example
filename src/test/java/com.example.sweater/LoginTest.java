@@ -1,12 +1,11 @@
 package com.example.sweater;
 
-import com.example.sweater.controller.MainController;
+import com.example.sweater.controller.MessageController;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestBuilders;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -35,7 +34,7 @@ public class LoginTest {
     //before the test methods are run. We use AssertJ (which provides assertThat()
     //and other methods) to express the test assertions.
     @Autowired
-    private MainController controller;
+    private MessageController controller;
 
     // Another useful approach is to not start the server at all but to test only the layer
     //below that, where Spring handles the incoming HTTP request and hands it off to your
