@@ -2,6 +2,7 @@ package com.example.sweater.controller;
 
 import com.example.sweater.domain.Message;
 import com.example.sweater.domain.User;
+import com.example.sweater.domain.dto.MessageDto;
 import com.example.sweater.repository.MessageRepository;
 import com.example.sweater.service.MessageService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,11 +17,11 @@ import org.springframework.ui.Model;
 import org.springframework.util.StringUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.web.util.UriComponents;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.validation.Valid;
 import java.io.File;
@@ -64,10 +65,11 @@ public class MessageController {
     @GetMapping("/main")
     public String main(@RequestParam(required = false, defaultValue = "") String filter,
                        Model model,
-                       @PageableDefault(sort = { "id" }, direction = Sort.Direction.DESC) Pageable pageable) { //Pageable serve for page-by-page display of long lists(is also added to MessageRepository);
-                        // sort param show type of sorting(in our case: sorting by "id"); direction param describe direction of sort(in our case: first of all we will display latest messages added
-                        // @PageableDefault needed to prevent mistakes
-        Page<Message> page = messageService.messageList(pageable, filter);
+                       @AuthenticationPrincipal User user, //we get the current user as a parameter from session
+                       @PageableDefault(sort = {"id"}, direction = Sort.Direction.DESC) Pageable pageable) { //Pageable serve for page-by-page display of long lists(is also added to MessageRepository);
+        // sort param show type of sorting(in our case: sorting by "id"); direction param describe direction of sort(in our case: first of all we will display latest messages added
+        // @PageableDefault needed to prevent mistakes
+        Page<MessageDto> page = messageService.messageList(pageable, filter, user);
 
         model.addAttribute("page", page);
         model.addAttribute("url", "/main");
@@ -102,6 +104,7 @@ public class MessageController {
         Iterable<Message> messages = messageRepository.findAll();
         model.addAttribute("messages", messages);
         model.addAttribute("filter", "");
+        model.addAttribute("url", "/main");
         return "main";
     }
 
@@ -126,10 +129,10 @@ public class MessageController {
                                @PathVariable User author, //user that we want to receive(we may omit annotation param name="user", as out User variable has got the same name)
                                Model model,
                                @RequestParam(required = false) Message message,
-                               @PageableDefault(sort = { "id" }, direction = Sort.Direction.DESC) Pageable pageable) { //Pageable serve for page-by-page display of long lists(is also added to MessageRepository);
-                                // sort param show type of sorting(in our case: sorting by "id"); direction param describe direction of sort(in our case: first of all we will display latest messages added
-                                // @PageableDefault needed to prevent mistakes
-        Page<Message> page = messageService.messageListForUser(pageable, currentUser, author);
+                               @PageableDefault(sort = {"id"}, direction = Sort.Direction.DESC) Pageable pageable) { //Pageable serve for page-by-page display of long lists(is also added to MessageRepository);
+        // sort param show type of sorting(in our case: sorting by "id"); direction param describe direction of sort(in our case: first of all we will display latest messages added
+        // @PageableDefault needed to prevent mistakes
+        Page<MessageDto> page = messageService.messageListForUser(pageable, currentUser, author);
 
         model.addAttribute("isSubscriber", author.getSubscribers().contains(currentUser));
         model.addAttribute("subscriptionsCount", author.getSubscriptions().size());
@@ -162,5 +165,30 @@ public class MessageController {
             messageRepository.save(message);
         }
         return "redirect:/user-messages/" + user;
+    }
+
+    @GetMapping("/messages/{message}/like")
+    public String like(@AuthenticationPrincipal User currentUser, //we get the current user as a parameter from session
+                       @PathVariable Message message,
+                       RedirectAttributes redirectAttributes, //parameter, that allow us to throw some arguments in method, that we chose redirect to(this param takes from param of current method)
+                       @RequestHeader(required = false) String referer) { //@RequestHeader gave ot us a page, from which we have came with like
+        Set<User> likes = message.getLikes();
+
+        //adding or removing likes
+        if (likes.contains(currentUser)) {
+            likes.remove(currentUser);
+        } else {
+            likes.add(currentUser);
+        }
+
+        //extracting parameters from current method
+        UriComponents components = UriComponentsBuilder.fromHttpUrl(referer).build();
+        components.getQueryParams()
+                .entrySet()
+                .forEach(pair -> redirectAttributes.addAttribute(pair.getKey(), pair.getValue()));
+        //thus we  transfer all obtained attributes(pagination param, current location on page and etc. ) as parameter to redirected method
+
+        //we should to redirect user to the same page, where he came from
+        return "redirect:" + components.getPath();
     }
 }

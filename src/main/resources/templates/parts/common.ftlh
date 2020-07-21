@@ -11,6 +11,7 @@
               integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk"
               crossorigin="anonymous"/>
         <script src="https://www.google.com/recaptcha/api.js"></script>
+        <script src="https://kit.fontawesome.com/9932631f18.js" crossorigin="anonymous"></script>
     </head>
     <body>
     <#include "navbar.ftlh">
