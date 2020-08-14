@@ -10,7 +10,7 @@ public class MessageDto {
     private String tag;
     private User author;
     private String filename;
-    private Long likes; //we don`t need to show all likes(list), so we just send a count
+    private Long likes; //we don`t need to show all likes(list), so we just send their total number
     private Boolean meLiked; //is this user liked this message
 
     public MessageDto(Message message, Long likes, Boolean meLiked) {
